@@ -1,3 +1,10 @@
 modules:
   default:
-    driver_type: "kcs"
+    # Available collectors are bmc, bmc-watchdog, ipmi, chassis, dcmi, sel, sel-events and sm-lan-mode
+    collectors:
+      - bmc
+      - ipmi
+      - dcmi
+      - chassis
+      - sel
+      - sel-events
