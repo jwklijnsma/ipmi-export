@@ -28,6 +28,6 @@ RUN chown -R root:root /opt/ipmi_exporter
 
 EXPOSE 9290
 
-# Run as root (default user in Docker)
 CMD ["/opt/ipmi_exporter/ipmi_exporter", \
-     "--config.file=/opt/ipmi_exporter/ipmi.yml"]
+     "--config.file=/opt/ipmi_exporter/ipmi.yml", \
+     "--native-ipmi"]
