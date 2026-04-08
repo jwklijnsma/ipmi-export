@@ -7,4 +7,3 @@ modules:
       - dcmi
       - chassis
       - sel
-      - sel-events
