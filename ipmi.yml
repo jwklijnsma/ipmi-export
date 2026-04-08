@@ -1,6 +1,6 @@
 modules:
   default:
-    driver: OPENIPMI
+    driver: KCS
     # Available collectors are bmc, bmc-watchdog, ipmi, chassis, dcmi, sel, sel-events and sm-lan-mode
     collectors:
       - bmc
