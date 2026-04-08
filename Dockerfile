@@ -29,5 +29,4 @@ RUN chown -R root:root /opt/ipmi_exporter
 EXPOSE 9290
 
 CMD ["/opt/ipmi_exporter/ipmi_exporter", \
-     "--config.file=/opt/ipmi_exporter/ipmi.yml", \
-     "--native-ipmi"]
+     "--config.file=/opt/ipmi_exporter/ipmi.yml"]
