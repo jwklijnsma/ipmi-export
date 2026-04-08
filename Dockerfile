@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /opt
 
 # Download ipmi-exporter
-ENV IPMI_EXPORTER_VERSION=1.6.1
+ENV IPMI_EXPORTER_VERSION=1.10.1
 
 RUN wget https://github.com/prometheus-community/ipmi_exporter/releases/download/v${IPMI_EXPORTER_VERSION}/ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64.tar.gz && \
     tar xvf ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64.tar.gz && \
@@ -29,4 +29,5 @@ RUN chown -R root:root /opt/ipmi_exporter
 EXPOSE 9290
 
 CMD ["/opt/ipmi_exporter/ipmi_exporter", \
-     "--config.file=/opt/ipmi_exporter/ipmi.yml"]
+     "--config.file=/opt/ipmi_exporter/ipmi.yml", \
+     "--native-ipmi" ]
