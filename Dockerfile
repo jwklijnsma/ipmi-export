@@ -1,12 +1,19 @@
-FROM redhat/ubi10-micro:latest-source
+FROM redhat/ubi10:latest AS builder
+
+RUN microdnf install -y wget && \
+    microdnf clean all
+
+FROM redhat/ubi10-micro:latest
+
+COPY --from=builder /usr/bin/wget /usr/bin/wget
+COPY --from=builder /usr/lib64/libpcre2-8.so.0 /usr/lib64/
+COPY --from=builder /usr/lib64/libssl.so.3 /usr/lib64/
+COPY --from=builder /usr/lib64/libcrypto.so.3 /usr/lib64/
 
 WORKDIR /opt
 
 # Download ipmi-exporter
 ENV IPMI_EXPORTER_VERSION=1.10.1
-
-RUN microdnf install -y wget && \
-    microdnf clean all
 
 RUN wget https://github.com/prometheus-community/ipmi_exporter/releases/download/v${IPMI_EXPORTER_VERSION}/ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64.tar.gz && \
     tar xvf ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64.tar.gz && \
