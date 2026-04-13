@@ -1,7 +1,7 @@
 FROM redhat/ubi10:latest AS builder
 
-RUN microdnf install -y wget && \
-    microdnf clean all
+RUN dnf install -y wget && \
+    dnf clean all
 
 FROM redhat/ubi10-micro:latest
 
