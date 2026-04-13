@@ -1,14 +1,5 @@
-FROM ubuntu:24.04
-
+FROM redhat/ubi10-micro:latest-source
 ENV DEBIAN_FRONTEND=noninteractive
-
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    ipmitool \
-    freeipmi-tools \
-    wget \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
 
