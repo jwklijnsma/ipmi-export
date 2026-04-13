@@ -1,5 +1,4 @@
 FROM redhat/ubi10-micro:latest-source
-ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /opt
 
