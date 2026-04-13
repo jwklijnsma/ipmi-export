@@ -9,7 +9,7 @@ COPY --from=builder /usr/bin/wget /usr/bin/wget
 COPY --from=builder /usr/lib64/libpcre2-8.so.0 /usr/lib64/
 COPY --from=builder /usr/lib64/libssl.so.3 /usr/lib64/
 COPY --from=builder /usr/lib64/libcrypto.so.3 /usr/lib64/
-
+COPY --from=builder /usr/lib64/libuuid.so.1 /usr/lib64/
 WORKDIR /opt
 
 # Download ipmi-exporter
