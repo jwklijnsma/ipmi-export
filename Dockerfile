@@ -7,7 +7,6 @@ RUN dnf install -y \
         wget \
         tar \
         ipmitool \
-        freeipmi \
     && dnf clean all
 
 WORKDIR /build
