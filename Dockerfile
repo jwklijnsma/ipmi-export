@@ -9,7 +9,6 @@ RUN dnf update -y && \
     dnf install -y \
         wget \
         tar \
-        ipmitool \
         freeipmi \
     && dnf clean all
 
