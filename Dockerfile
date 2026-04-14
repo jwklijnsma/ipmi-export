@@ -1,50 +1,44 @@
-# -------- Stage 1: builder --------
-FROM redhat/ubi10:latest AS builder
+# ---------------- Stage 1: builder ----------------
+FROM rockylinux:9 AS builder
 
 ARG IPMI_EXPORTER_VERSION=1.10.1
 
-RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
-
-RUN dnf update -y && \
-    dnf install -y \
+RUN dnf install -y \
         wget \
         tar \
+        ipmitool \
         freeipmi \
+        findutils \
     && dnf clean all
 
 WORKDIR /build
 
 # Download ipmi_exporter
-RUN wget https://github.com/prometheus-community/ipmi_exporter/releases/download/v${IPMI_EXPORTER_VERSION}/ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64.tar.gz && \
+RUN wget -q https://github.com/prometheus-community/ipmi_exporter/releases/download/v${IPMI_EXPORTER_VERSION}/ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64.tar.gz && \
     tar xvf ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64.tar.gz && \
-    mv ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64 ipmi_exporter && \
-    rm ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64.tar.gz
+    mv ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64 ipmi_exporter
 
-# -------- Stage 2: micro --------
-FROM redhat/ubi10-micro:latest
+# ---------------- dependency collection ----------------
+RUN mkdir -p /out/bin /out/lib
 
-# Copy exporter
-COPY --from=builder /build/ipmi_exporter /opt/ipmi_exporter
+# Copy binaries
+RUN cp /usr/bin/ipmitool /out/bin/ || true && \
+    cp -r /usr/sbin/ipmi-* /out/bin/ || true && \
+    cp -r ipmi_exporter /out/bin/
 
-# Copy ipmitool + freeipmi binaries
-COPY --from=builder /usr/bin/ipmitool /usr/bin/ipmitool
-COPY --from=builder /usr/sbin/ipmi-* /usr/sbin/
+# Copy ONLY required shared libraries (critical step)
+RUN for bin in /out/bin/*; do \
+        ldd $bin 2>/dev/null | awk '{print $3}' | grep -E '^/' || true; \
+    done | sort -u | xargs -I{} cp -v --parents {} /out/lib || true
 
-# Copy required libraries (broad copy, safer)
-COPY --from=builder /usr/lib64 /usr/lib64
-COPY --from=builder /lib64 /lib64
+# ---------------- Stage 2: distroless runtime ----------------
+FROM gcr.io/distroless/base-debian12
 
-# Optional: configs (freeipmi sometimes needs this)
-COPY --from=builder /etc/freeipmi /etc/freeipmi
+COPY --from=builder /out/bin/ /usr/local/bin/
+COPY --from=builder /out/lib/ /
 
-
-# Copy config
-COPY ipmi.yml /opt/ipmi_exporter/ipmi.yml
-
-# Ensure root owns everything (default, but explicit)
-RUN chown -R root:root /opt/ipmi_exporter
+COPY ipmi.yml /etc/ipmi.yml
 
 EXPOSE 9290
 
-CMD ["/opt/ipmi_exporter/ipmi_exporter", \
-     "--config.file=/opt/ipmi_exporter/ipmi.yml"]
+CMD ["/usr/local/bin/ipmi_exporter/ipmi_exporter", "--config.file=/etc/ipmi.yml"]
