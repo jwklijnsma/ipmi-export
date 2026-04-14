@@ -32,7 +32,7 @@ RUN for bin in /out/bin/*; do \
     done | sort -u | xargs -I{} cp -v --parents {} /out/lib || true
 
 # ---------------- Stage 2: distroless runtime ----------------
-FROM gcr.io/distroless/base-debian12
+FROM redhat/ubi10-micro
 
 COPY --from=builder /out/bin/ /usr/local/bin/
 COPY --from=builder /out/lib/ /
