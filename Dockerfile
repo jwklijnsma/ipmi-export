@@ -1,15 +1,5 @@
-FROM redhat/ubi10:latest AS builder
-
-RUN dnf install -y wget && \
-    dnf clean all
-
 FROM redhat/ubi10-micro:latest
 
-COPY --from=builder /usr/bin/wget /usr/bin/wget
-COPY --from=builder /usr/lib64/libpcre2-8.so.0 /usr/lib64/
-COPY --from=builder /usr/lib64/libssl.so.3 /usr/lib64/
-COPY --from=builder /usr/lib64/libcrypto.so.3 /usr/lib64/
-COPY --from=builder /usr/lib64/libuuid.so.1 /usr/lib64/
 WORKDIR /opt
 
 # Download ipmi-exporter
