@@ -20,15 +20,40 @@ RUN wget https://github.com/prometheus-community/ipmi_exporter/releases/download
 
 FROM redhat/ubi10-micro:latest
 
-WORKDIR /opt
+ARG IPMI_EXPORTER_VERSION=1.6.0
 
-# Download ipmi-exporter
-ENV IPMI_EXPORTER_VERSION=1.10.1
+RUN dnf install -y \
+        wget \
+        tar \
+        ipmitool \
+        freeipmi \
+    && dnf clean all
 
+WORKDIR /build
+
+# Download ipmi_exporter
 RUN wget https://github.com/prometheus-community/ipmi_exporter/releases/download/v${IPMI_EXPORTER_VERSION}/ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64.tar.gz && \
     tar xvf ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64.tar.gz && \
     mv ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64 ipmi_exporter && \
     rm ipmi_exporter-${IPMI_EXPORTER_VERSION}.linux-amd64.tar.gz
+
+# -------- Stage 2: micro --------
+FROM registry.access.redhat.com/ubi10/ubi-micro
+
+# Copy exporter
+COPY --from=builder /build/ipmi_exporter /opt/ipmi_exporter
+
+# Copy ipmitool + freeipmi binaries
+COPY --from=builder /usr/bin/ipmitool /usr/bin/ipmitool
+COPY --from=builder /usr/sbin/ipmi-* /usr/sbin/
+
+# Copy required libraries (broad copy, safer)
+COPY --from=builder /usr/lib64 /usr/lib64
+COPY --from=builder /lib64 /lib64
+
+# Optional: configs (freeipmi sometimes needs this)
+COPY --from=builder /etc/freeipmi /etc/freeipmi
+
 
 # Copy config
 COPY ipmi.yml /opt/ipmi_exporter/ipmi.yml
