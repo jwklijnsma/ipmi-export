@@ -2,7 +2,7 @@
 FROM redhat/ubi10:latest AS builder
 
 ARG IPMI_EXPORTER_VERSION=1.10.1
-RUN dnf install -y epel-release
+RUN dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
 
 RUN dnf install -y \
         wget \
