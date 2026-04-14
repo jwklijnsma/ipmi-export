@@ -5,7 +5,8 @@ ARG IPMI_EXPORTER_VERSION=1.10.1
 
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
 
-RUN dnf install -y \
+RUN dnf update -y && \
+    dnf install -y \
         wget \
         tar \
         ipmitool \
