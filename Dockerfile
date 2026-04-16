@@ -43,8 +43,6 @@ COPY --from=builder /out/lib/ /usr/local/lib/
 # ✅ FIX: tell loader where libs are
 ENV LD_LIBRARY_PATH=/usr/local/lib
 
-COPY ipmi.yml /etc/ipmi.yml
-
 EXPOSE 9290
 
-CMD ["/usr/local/bin/ipmi_exporter/ipmi_exporter", "--config.file=/etc/ipmi.yml"]
+CMD ["/usr/local/bin/ipmi_exporter/ipmi_exporter", "--config.file=/config.yml"]
