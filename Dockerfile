@@ -2,7 +2,7 @@
 # Match the runtime base (debian12 / bookworm) so glibc versions align with
 # gcr.io/distroless/base-debian12. Building on debian:13 against a debian12
 # runtime causes glibc symbol mismatches that break freeipmi tools silently.
-FROM debian:12-slim AS builder
+FROM debian:13-slim AS builder
 
 ARG IPMI_EXPORTER_VERSION=1.10.1
 ARG TARGETARCH=amd64
